@@ -1,7 +1,9 @@
 package com.melck.mckclinic.servicies;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,11 +37,10 @@ public class ScheduleService {
 
     @Transactional
     public Schedule create(CreateScheduleDTO dto){
-        return extracted(dto);
-
+        return convertToCreatSchedule(dto);
     }
 
-    private Schedule extracted(CreateScheduleDTO dto) {
+    private Schedule convertToCreatSchedule(CreateScheduleDTO dto) {
         User user = userService.findById(dto.getUserId());
         Doctor doctor =doctorService.findById(dto.getDoctorId());
         Specialty specialty = new Specialty();
@@ -56,11 +57,16 @@ public class ScheduleService {
 
     @Transactional
     public ResponseScheduleDTO findById(Long id) {
-       return scheduleRepository.findById(id).map(schedule -> {
-                return converToResponse(schedule);
-       }).orElseThrow(() -> new ObjectNotFoundException("the schedule with id: " + id + " not be founded"));
+        return scheduleRepository.findById(id).map(schedule -> {
+            return convertToResponse(schedule);
+        }).orElseThrow(() -> new ObjectNotFoundException("the schedule with id: " + id + " not be founded"));
     }
-
+    
+    public List<ResponseScheduleDTO> findAllByUser(Long id_user) {
+        userService.findById(id_user);
+        List<Schedule> schedule = scheduleRepository.findAllByUser(id_user);
+        return schedule.stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
+    }
     
     public void updateStatus( Long id) {
         Optional<Schedule> schedule = scheduleRepository.findById(id);
@@ -75,7 +81,7 @@ public class ScheduleService {
         schedule.ifPresent(sc -> scheduleRepository.delete(sc));
     }
 
-    private ResponseScheduleDTO converToResponse(Schedule schedule) {
+    private ResponseScheduleDTO convertToResponse(Schedule schedule) {
         ResponseScheduleDTO dto = new ResponseScheduleDTO();
         dto.setDoctorName(schedule.getDoctor().getName());
         dto.setUserName(schedule.getUser().getName());
@@ -85,5 +91,4 @@ public class ScheduleService {
         dto.setType(schedule.getType().toString());
       return dto;
     }
-
 }
