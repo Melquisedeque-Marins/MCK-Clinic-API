@@ -1,0 +1,10 @@
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/dto/UserDTO.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/entities/User.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/MckClinicApplication.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/repositories/UserRepository.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/mapper/ModelMapperConfig.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/servicies/exceptions/ObjectNotFoundException.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/resources/UserResource.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/servicies/UserService.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/resources/exception/StandardError.java
+/home/melck/Projetos/Java/mck-clinic/src/main/java/com/melck/mckclinic/resources/exception/ControllerExceptionHandler.java
