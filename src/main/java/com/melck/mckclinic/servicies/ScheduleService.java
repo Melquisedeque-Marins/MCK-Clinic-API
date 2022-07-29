@@ -3,13 +3,11 @@ package com.melck.mckclinic.servicies;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.melck.mckclinic.dto.CreateScheduleDTO;
-import com.melck.mckclinic.dto.ResponseScheduleDTO;
 import com.melck.mckclinic.entities.Doctor;
 import com.melck.mckclinic.entities.Schedule;
 import com.melck.mckclinic.entities.Specialty;
@@ -56,16 +54,15 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ResponseScheduleDTO findById(Long id) {
-        return scheduleRepository.findById(id).map(schedule -> {
-            return convertToResponse(schedule);
-        }).orElseThrow(() -> new ObjectNotFoundException("the schedule with id: " + id + " not be founded"));
+    public Schedule findById(Long id) {
+        return scheduleRepository.findById(id)
+            .orElseThrow(() -> new ObjectNotFoundException("the schedule with id: " + id + " not be founded"));
     }
     
-    public List<ResponseScheduleDTO> findAllByUser(Long id_user) {
+    public List<Schedule> findAllByUser(Long id_user) {
         userService.findById(id_user);
         List<Schedule> schedule = scheduleRepository.findAllByUser(id_user);
-        return schedule.stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
+        return schedule;
     }
     
     public void updateStatus( Long id) {
@@ -81,14 +78,4 @@ public class ScheduleService {
         schedule.ifPresent(sc -> scheduleRepository.delete(sc));
     }
 
-    private ResponseScheduleDTO convertToResponse(Schedule schedule) {
-        ResponseScheduleDTO dto = new ResponseScheduleDTO();
-        dto.setDoctorName(schedule.getDoctor().getName());
-        dto.setUserName(schedule.getUser().getName());
-        dto.setSpecialty(schedule.getDoctor().getSpecialty().getDescription());
-        dto.setScheduleDate(schedule.getScheduleDate());
-        dto.setStatus(schedule.getStatus().toString());
-        dto.setType(schedule.getType().toString());
-      return dto;
-    }
 }

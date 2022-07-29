@@ -1,9 +1,15 @@
 package com.melck.mckclinic.dto;
 
+import javax.validation.constraints.NotEmpty;
+
 public class CreateDoctorDTO {
     
+    @NotEmpty(message = "the name field cannot be empty")
     private String name;
+
+    @NotEmpty(message = "the registry field cannot be empty")
     private String registry;
+
     private Long specialtyId;
 
     public String getName() {
