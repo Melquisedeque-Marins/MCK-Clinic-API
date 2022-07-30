@@ -11,9 +11,10 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.melck.mckclinic.entities.enums.Gender;
 
 
-public class UserDTO implements Serializable{
+public class CreateUserDTO implements Serializable{
 
     private Long id;
 
@@ -39,11 +40,14 @@ public class UserDTO implements Serializable{
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthDate;
 
-    public UserDTO() {
+    @NotNull(message = "Choose one of the options for gender field")
+    private Gender gender;
+
+    public CreateUserDTO() {
     }
 
-    public UserDTO(Long id, String name, String email, String cpf, String password, String phoneNumber,
-            LocalDate birthDate) {
+    public CreateUserDTO(Long id, String name, String email, String cpf, String password, String phoneNumber,
+            LocalDate birthDate, Gender gender) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -51,6 +55,7 @@ public class UserDTO implements Serializable{
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
+        this.gender = gender;
     }
 
     public Long getId() {
@@ -108,6 +113,15 @@ public class UserDTO implements Serializable{
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
+    
+    
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
 
     @Override
     public int hashCode() {
@@ -126,7 +140,7 @@ public class UserDTO implements Serializable{
             return false;
         if (getClass() != obj.getClass())
             return false;
-        UserDTO other = (UserDTO) obj;
+        CreateUserDTO other = (CreateUserDTO) obj;
         if (cpf == null) {
             if (other.cpf != null)
                 return false;
@@ -139,9 +153,5 @@ public class UserDTO implements Serializable{
             return false;
         return true;
     }
-
-    
-    
-    
 
 }

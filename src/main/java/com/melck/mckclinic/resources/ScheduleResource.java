@@ -48,10 +48,17 @@ public class ScheduleResource {
     }
 
     @GetMapping
-    public ResponseEntity<List<ResponseScheduleDTO>> findByUser(@RequestParam (value = "user", defaultValue = "0") Long id_user){
+    public ResponseEntity<List<ResponseScheduleDTO>> findAllByUser(@RequestParam (value = "user", defaultValue = "0") Long id_user){
         List<ResponseScheduleDTO> dto = scheduleService.findAllByUser(id_user).stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
         return ResponseEntity.ok().body(dto);
     }
+    /* 
+    @GetMapping
+    public ResponseEntity<List<ResponseScheduleDTO>> findAllByDoctor(@RequestParam (value = "doctor", defaultValue = "0") Long id_doctor){
+        List<ResponseScheduleDTO> dto = scheduleService.findAllByDoctor(id_doctor).stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
+        return ResponseEntity.ok().body(dto);
+    }
+    */
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Schedule> delete(@PathVariable Long id){
@@ -65,11 +72,10 @@ public class ScheduleResource {
         return ResponseEntity.noContent().build();
     }
 
-
     private ResponseScheduleDTO convertToResponse(Schedule schedule) {
         ResponseScheduleDTO dto = new ResponseScheduleDTO();
-        dto.setDoctorName(schedule.getDoctor().getName());
-        dto.setUserName(schedule.getUser().getName());
+        dto.setDoctor(schedule.getDoctor().getName());
+        dto.setUser(schedule.getUser().getName());
         dto.setSpecialty(schedule.getDoctor().getSpecialty().getDescription());
         dto.setScheduleDate(schedule.getScheduleDate());
         dto.setStatus(schedule.getStatus().toString());

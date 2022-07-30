@@ -24,8 +24,7 @@ public class DoctorService {
     }
 
     public Doctor save(CreateDoctorDTO createDoctorDTO) {
-        Doctor doctor = converteToDoctor(createDoctorDTO);
-        return doctorRepository.save(doctor);
+        return doctorRepository.save(converteToDoctor(createDoctorDTO));
     }
     
     public Doctor findById(long id){
@@ -39,9 +38,7 @@ public class DoctorService {
     }
 
     public void delete(Long id) {
-        Doctor doctor = findById(id);
-        doctorRepository.delete(doctor);
-
+        doctorRepository.delete(findById(id));
     }
     
     private Doctor converteToDoctor(CreateDoctorDTO createDoctorDTO) {

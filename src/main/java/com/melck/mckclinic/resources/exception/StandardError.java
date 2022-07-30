@@ -1,27 +1,27 @@
 package com.melck.mckclinic.resources.exception;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class StandardError {
 
-    private Instant timeStamp;
+    private LocalDateTime timeStamp;
     private Integer status;
     private String Error;
 
     public StandardError() {
     }
 
-    public StandardError(Instant timeStamp, Integer status, String error) {
+    public StandardError(LocalDateTime timeStamp, Integer status, String error) {
         this.timeStamp = timeStamp;
         this.status = status;
         Error = error;
     }
 
-    public Instant getTimeStamp() {
+    public LocalDateTime getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Instant timeStamp) {
+    public void setTimeStamp(LocalDateTime timeStamp) {
         this.timeStamp = timeStamp;
     }
 

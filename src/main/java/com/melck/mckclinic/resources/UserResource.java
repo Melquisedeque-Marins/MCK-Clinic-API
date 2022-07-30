@@ -1,7 +1,10 @@
 package com.melck.mckclinic.resources;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -17,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.melck.mckclinic.dto.UserDTO;
+import com.melck.mckclinic.dto.CreateUserDTO;
+import com.melck.mckclinic.dto.ListResponseUserDTO;
+import com.melck.mckclinic.dto.ResponseUserDTO;
 import com.melck.mckclinic.entities.User;
 import com.melck.mckclinic.servicies.UserService;
 
@@ -35,27 +40,46 @@ public class UserResource {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> create(@Valid @RequestBody UserDTO userDTO){
+    public ResponseEntity<User> create(@Valid @RequestBody CreateUserDTO userDTO){
         User newUser = userService.save(userDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path(("/{id}")).buildAndExpand(newUser.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 
+    /*
+    @GetMapping("/{cpf}")
+    public ResponseEntity<ResponseUserDTO> findByCpf(@PathVariable String cpf){
+        User user = userService.findByCpf(cpf);
+        ResponseUserDTO dto = modelMapper.map(user, ResponseUserDTO.class);
+        Long years = ChronoUnit.YEARS.between(user.getBirthDate(), LocalDate.now());
+        dto.setAge(years);
+        return ResponseEntity.ok().body(dto);
+    }
+     */
+
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id){
+    public ResponseEntity<ResponseUserDTO> findById(@PathVariable Long id){
         User user = userService.findById(id);
-        return ResponseEntity.ok().body(modelMapper.map(user, UserDTO.class));
+        ResponseUserDTO dto = modelMapper.map(user, ResponseUserDTO.class);
+        Long years = ChronoUnit.YEARS.between(user.getBirthDate(), LocalDate.now());
+        dto.setAge(years);
+        return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> findAll(){
-        List<UserDTO> list = userService.findAll();
-        return ResponseEntity.ok().body(list);
+    public ResponseEntity<List<ListResponseUserDTO>> findAll(){
+        List<User> list = userService.findAll();
+        List<ListResponseUserDTO> listDTO = list
+                .stream()
+                .map(user -> modelMapper.map(user, ListResponseUserDTO.class))
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.ok().body(listDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<User> delete(@PathVariable Long id){
-        userService.delete(id);
+    @DeleteMapping("/{cpf}")
+    public ResponseEntity<User> delete(@PathVariable String cpf){
+        userService.deleteByCpf(cpf);
         return ResponseEntity.noContent().build();
     }
 }

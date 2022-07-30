@@ -8,8 +8,8 @@ public class ResponseScheduleDTO {
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime scheduleDate;
-    private String userName;
-    private String doctorName;
+    private String user;
+    private String doctor;
     private String specialty;
     private String status;
     private String type;
@@ -27,17 +27,17 @@ public class ResponseScheduleDTO {
     public void setSpecialty(String specialty) {
         this.specialty = specialty;
     }
-    public String getUserName() {
-        return userName;
+    public String getUser() {
+        return user;
     }
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser(String user) {
+        this.user = user;
     }
-    public String getDoctorName() {
-        return doctorName;
+    public String getDoctor() {
+        return doctor;
     }
-    public void setDoctorName(String doctorName) {
-        this.doctorName = doctorName;
+    public void setDoctor(String doctor) {
+        this.doctor = doctor;
     }
     public String getStatus() {
         return status;

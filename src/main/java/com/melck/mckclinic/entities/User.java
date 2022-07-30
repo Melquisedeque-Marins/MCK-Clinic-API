@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.melck.mckclinic.entities.enums.Gender;
 
 @Entity
 @Table(name = "tb_user")
@@ -25,10 +29,15 @@ public class User implements Serializable{
     
     private String name;
     private String email;
+
+    @Column(unique = true)
     private String cpf;
     private String password;
     private String phoneNumber;
     private LocalDate birthDate;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender; 
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
@@ -96,9 +105,17 @@ public class User implements Serializable{
     public List<Schedule> getSchedules() {
         return schedules;
     }
-
+    
     public void setSchedules(List<Schedule> schedules) {
         this.schedules = schedules;
+    }
+    
+    public Gender getGender() {
+        return gender;
+    }
+    
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
     @Override
@@ -130,9 +147,5 @@ public class User implements Serializable{
         } else if (!id.equals(other.id))
             return false;
         return true;
-    }
-
-    
-    
-    
+    }  
 }
