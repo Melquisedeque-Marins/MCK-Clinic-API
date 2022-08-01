@@ -1,6 +1,7 @@
 package com.melck.mckclinic.resources.exception;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.servlet.ServletRequest;
 
@@ -12,15 +13,19 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.melck.mckclinic.servicies.exceptions.DataIntegrityViolationException;
+import com.melck.mckclinic.servicies.exceptions.InvalidDateException;
 import com.melck.mckclinic.servicies.exceptions.ObjectIsAlreadyInUseException;
 import com.melck.mckclinic.servicies.exceptions.ObjectNotFoundException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
+
+    DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     
     @ExceptionHandler(ObjectNotFoundException.class)
     public ResponseEntity<StandardError> objectNotFoundException(ObjectNotFoundException e, ServletRequest request){
-        StandardError error = new StandardError(LocalDateTime.now(), HttpStatus.NOT_FOUND.value(), e.getMessage());
+        LocalDateTime now = LocalDateTime.now();
+        StandardError error = new StandardError(now, HttpStatus.NOT_FOUND.value(), e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
@@ -35,6 +40,13 @@ public class ControllerExceptionHandler {
         StandardError error = new StandardError(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
+    @ExceptionHandler(InvalidDateException .class)
+    public ResponseEntity<StandardError> invalidDateException(InvalidDateException e, ServletRequest request){
+        StandardError error = new StandardError(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<StandardError> validationException(MethodArgumentNotValidException e, ServletRequest request){

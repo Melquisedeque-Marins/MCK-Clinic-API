@@ -37,5 +37,7 @@ public class SpecialtyResource {
         return ResponseEntity.ok().body(specialty);
     }
 
+    
+
 
 }

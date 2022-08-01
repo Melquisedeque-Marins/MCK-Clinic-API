@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -48,18 +47,12 @@ public class ScheduleResource {
     }
 
     @GetMapping
-    public ResponseEntity<List<ResponseScheduleDTO>> findAllByUser(@RequestParam (value = "user", defaultValue = "0") Long id_user){
-        List<ResponseScheduleDTO> dto = scheduleService.findAllByUser(id_user).stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
+    public ResponseEntity<List<ResponseScheduleDTO>> findAll(Schedule filtro){
+        List<Schedule> schedule = scheduleService.findAll(filtro);
+        List<ResponseScheduleDTO> dto = schedule.stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
         return ResponseEntity.ok().body(dto);
     }
-    /* 
-    @GetMapping
-    public ResponseEntity<List<ResponseScheduleDTO>> findAllByDoctor(@RequestParam (value = "doctor", defaultValue = "0") Long id_doctor){
-        List<ResponseScheduleDTO> dto = scheduleService.findAllByDoctor(id_doctor).stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
-        return ResponseEntity.ok().body(dto);
-    }
-    */
-
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Schedule> delete(@PathVariable Long id){
         scheduleService.delete(id);
@@ -71,7 +64,7 @@ public class ScheduleResource {
         scheduleService.updateStatus(id);
         return ResponseEntity.noContent().build();
     }
-
+    
     private ResponseScheduleDTO convertToResponse(Schedule schedule) {
         ResponseScheduleDTO dto = new ResponseScheduleDTO();
         dto.setDoctor(schedule.getDoctor().getName());
@@ -80,6 +73,20 @@ public class ScheduleResource {
         dto.setScheduleDate(schedule.getScheduleDate());
         dto.setStatus(schedule.getStatus().toString());
         dto.setType(schedule.getType().toString());
-      return dto;
+        return dto;
     }
+
+    /* 
+    @GetMapping
+    public ResponseEntity<List<ResponseScheduleDTO>> findAllByUser(@RequestParam (value = "user", defaultValue = "0") Long id_user){
+       List<ResponseScheduleDTO> dto = scheduleService.findAllByUser(id_user).stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
+       return ResponseEntity.ok().body(dto);
+    }
+    
+    @GetMapping
+    public ResponseEntity<List<ResponseScheduleDTO>> findAllByDoctor(@RequestParam (value = "doctor", defaultValue = "0") Long id_doctor){
+       List<ResponseScheduleDTO> dto = scheduleService.findAllByDoctor(id_doctor).stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
+       return ResponseEntity.ok().body(dto);
+    }
+    */
 }

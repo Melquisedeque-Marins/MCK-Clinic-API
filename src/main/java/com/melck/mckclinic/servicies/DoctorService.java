@@ -3,6 +3,7 @@ package com.melck.mckclinic.servicies;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.melck.mckclinic.dto.CreateDoctorDTO;
@@ -38,7 +39,14 @@ public class DoctorService {
     }
 
     public void delete(Long id) {
-        doctorRepository.delete(findById(id));
+       Doctor doctor = findById(id);
+        try {
+            doctorRepository.delete(doctor);
+            
+        } catch (DataIntegrityViolationException e) {
+            throw new com.melck.mckclinic.servicies.exceptions.DataIntegrityViolationException
+                                ("this doctor cannot be deleted. it has linked schedules.");
+        }
     }
     
     private Doctor converteToDoctor(CreateDoctorDTO createDoctorDTO) {
