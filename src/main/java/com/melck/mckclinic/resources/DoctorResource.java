@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.melck.mckclinic.dto.CreateDoctorDTO;
 import com.melck.mckclinic.dto.ResponseDoctorDTO;
+import com.melck.mckclinic.dto.ShortResponseDoctorDTO;
 import com.melck.mckclinic.entities.Doctor;
 import com.melck.mckclinic.entities.Specialty;
 import com.melck.mckclinic.servicies.DoctorService;
@@ -53,11 +54,11 @@ public class DoctorResource {
     }
     
     @GetMapping
-    public ResponseEntity<List<ResponseDoctorDTO>> findAll(Doctor filtro){
+    public ResponseEntity<List<ShortResponseDoctorDTO>> findAll(Doctor filtro){
         List<Doctor> doctors = doctorService.findAll(filtro);
-        List<ResponseDoctorDTO> doctorsDto = doctors
+        List<ShortResponseDoctorDTO> doctorsDto = doctors
                                             .stream()
-                                            .map(doctor -> convertToResponseDoctorDTO(doctor))
+                                            .map(doctor -> convertToShortResponseDoctorDTO(doctor))
                                             .collect(Collectors.toList());
         return ResponseEntity.ok().body(doctorsDto);
     }
@@ -75,21 +76,35 @@ public class DoctorResource {
         return ResponseEntity.noContent().build();
     }
     
-    private ResponseDoctorDTO convertToResponseDoctorDTO(Doctor doctor) {
-        ResponseDoctorDTO dto = new ResponseDoctorDTO();
-        dto.setName(doctor.getName());
-        dto.setRegistry(doctor.getRegistry());
-        dto.setSpecialty(doctor.getSpecialty().getDescription());
-        return dto;
-    }
-    
     private Doctor converteToDoctor(CreateDoctorDTO createDoctorDTO) {
         Specialty specialty = specialtyService.findById(createDoctorDTO.getSpecialtyId());
         Doctor doctor = new Doctor();
         doctor.setName(createDoctorDTO.getName());
         doctor.setRegistry(createDoctorDTO.getRegistry());
         doctor.setSpecialty(specialty);
+        doctor.setCpf(createDoctorDTO.getCpf());
+        doctor.setEmail(createDoctorDTO.getEmail());
+        doctor.setPhoneNumber(createDoctorDTO.getPhoneNumber());
         return doctor;
+    }
+
+    private ShortResponseDoctorDTO convertToShortResponseDoctorDTO(Doctor doctor) {
+        ShortResponseDoctorDTO dto = new ShortResponseDoctorDTO();
+        dto.setName(doctor.getName());
+        dto.setRegistry(doctor.getRegistry());
+        dto.setSpecialty(doctor.getSpecialty().getDescription());
+        return dto;
+    }
+    
+    private ResponseDoctorDTO convertToResponseDoctorDTO(Doctor doctor) {
+        ResponseDoctorDTO dto = new ResponseDoctorDTO();
+        dto.setName(doctor.getName());
+        dto.setRegistry(doctor.getRegistry());
+        dto.setSpecialty(doctor.getSpecialty().getDescription());
+        dto.setCpf(doctor.getCpf());
+        dto.setEmail(doctor.getEmail());
+        dto.setPhoneNumber(doctor.getPhoneNumber());
+        return dto;
     }
     /* 
     @GetMapping
@@ -97,6 +112,7 @@ public class DoctorResource {
         List<ResponseDoctorDTO> dto = doctorService.findAllBySpecialty(id_specialty).stream().map(dr -> convertToResponseDoctorDTO(dr)).collect(Collectors.toList());
         return ResponseEntity.ok().body(dto);
     }
+    
     */
     
 }

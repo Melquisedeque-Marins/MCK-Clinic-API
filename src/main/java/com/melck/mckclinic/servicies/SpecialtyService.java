@@ -1,5 +1,6 @@
 package com.melck.mckclinic.servicies;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -24,6 +25,15 @@ public class SpecialtyService {
     public Specialty findById(Long id){
         Optional<Specialty> specialty = specialtyRepository.findById(id);
         return specialty.orElseThrow(() -> new ObjectNotFoundException("the specialty with id: " + id + " not be founded"));
+    }
+
+    public List<Specialty> findAll() {
+        return specialtyRepository.findAll();
+    }
+
+    public void delete(Long id) {
+        Specialty specialty = findById(id);
+        specialtyRepository.delete(specialty);
     }
     
 }

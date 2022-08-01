@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.melck.mckclinic.entities.Doctor;
 import com.melck.mckclinic.repositories.DoctorRepository;
+import com.melck.mckclinic.servicies.exceptions.ObjectIsAlreadyInUseException;
 import com.melck.mckclinic.servicies.exceptions.ObjectNotFoundException;
 
 @Service
@@ -22,6 +23,9 @@ public class DoctorService {
     }
     
     public Doctor save(Doctor doctor) {
+        if (doctorRepository.findByCpf(doctor.getCpf()).isPresent()){
+            throw new ObjectIsAlreadyInUseException("cpf number: " + doctor.getCpf() + " is already in use");
+        }
         return doctorRepository.save(doctor);
     }
     
