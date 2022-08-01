@@ -7,7 +7,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -23,16 +22,18 @@ public class CreateUserDTO implements Serializable{
     private String name;
 
     @Email
+    @NotEmpty(message = "the e-mail field cannot be empty")
     private String email;
 
     @CPF
+    @NotEmpty(message = "the cpf field cannot be empty")
     private String cpf;
 
     @NotEmpty(message = "the password field cannot be empty")
     @Size(min = 8, max = 8)
     private String password;
 
-    @NotEmpty(message = "the phone number field cannot be empty")
+    @NotEmpty(message = "the phonenumber field cannot be empty")
     @Size(min = 13, max = 15)
     private String phoneNumber;
 

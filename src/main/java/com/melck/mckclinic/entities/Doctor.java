@@ -27,6 +27,11 @@ public class Doctor implements Serializable{
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(unique = true)
+    private String cpf;
+    private String phoneNumber;
+    private String email;
+
     @Column(name = "registry", nullable = false)
     private String registry;
 
@@ -78,6 +83,30 @@ public class Doctor implements Serializable{
         this.schedules = schedules;
     }
 
+    public String getCpf() {
+        return cpf;
+    }
 
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    
     
 }
