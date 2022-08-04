@@ -1,6 +1,6 @@
 package com.melck.mckclinic.resources.exception;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,8 +8,8 @@ public class ValidationError extends StandardError {
 
     private List<FieldMessage> errors = new ArrayList<>();
 
-    public ValidationError(LocalDateTime timeStamp, Integer status, String error) {
-        super(timeStamp, status, error);
+    public ValidationError(Instant timeStamp, Integer status, String error, String path) {
+        super(timeStamp, status, error, path);
     }
 
     public ValidationError() {

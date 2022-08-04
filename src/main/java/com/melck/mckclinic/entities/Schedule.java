@@ -1,6 +1,7 @@
 package com.melck.mckclinic.entities;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -12,23 +13,26 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.melck.mckclinic.entities.enums.Status;
 import com.melck.mckclinic.entities.enums.Type;
 
 @Entity
+@Table(name ="tb_schedule")
 public class Schedule implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "moment")
+    @Column(name = "moment", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime moment;
+    private Instant moment;
 
-    @Column(name = "schedule_date")
+    @Column(name = "schedule_date", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime scheduleDate;
 
@@ -59,12 +63,8 @@ public class Schedule implements Serializable {
         this.id = id;
     }
 
-    public LocalDateTime getMoment() {
+    public Instant getMoment() {
         return moment;
-    }
-
-    public void setMoment(LocalDateTime moment) {
-        this.moment = moment;
     }
 
     public LocalDateTime getScheduleDate() {
@@ -107,6 +107,10 @@ public class Schedule implements Serializable {
         this.doctor = doctor;
     }
 
+    @PrePersist
+    public void prePersist(){
+        moment = Instant.now();
+    }
     
    
     

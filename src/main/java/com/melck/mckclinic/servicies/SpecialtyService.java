@@ -3,6 +3,7 @@ package com.melck.mckclinic.servicies;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.melck.mckclinic.entities.Specialty;
@@ -33,7 +34,13 @@ public class SpecialtyService {
 
     public void delete(Long id) {
         Specialty specialty = findById(id);
-        specialtyRepository.delete(specialty);
+
+        try {
+            specialtyRepository.delete(specialty);  
+        } catch (DataIntegrityViolationException e) {
+           throw new com.melck.mckclinic.servicies.exceptions
+           .DataIntegrityViolationException("this user cannot be deleted. it has linked doctors.");
+        }
     }
     
 }

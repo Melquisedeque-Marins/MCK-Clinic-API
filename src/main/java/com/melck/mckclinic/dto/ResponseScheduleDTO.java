@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class ResponseScheduleDTO {
 
+    private Long id;
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime scheduleDate;
     private String user;
@@ -50,6 +51,12 @@ public class ResponseScheduleDTO {
     }
     public void setType(String type) {
         this.type = type;
+    }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     

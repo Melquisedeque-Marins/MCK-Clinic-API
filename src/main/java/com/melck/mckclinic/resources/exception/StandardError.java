@@ -1,27 +1,29 @@
 package com.melck.mckclinic.resources.exception;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class StandardError {
 
-    private LocalDateTime timeStamp;
+    private Instant timeStamp;
     private Integer status;
-    private String Error;
+    private String error;
+    private String path;
 
     public StandardError() {
     }
 
-    public StandardError(LocalDateTime timeStamp, Integer status, String error) {
+    public StandardError(Instant timeStamp, Integer status, String error, String path) {
         this.timeStamp = timeStamp;
         this.status = status;
-        Error = error;
+        this.error = error;
+        this.path = path;
     }
 
-    public LocalDateTime getTimeStamp() {
+    public Instant getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(LocalDateTime timeStamp) {
+    public void setTimeStamp(Instant timeStamp) {
         this.timeStamp = timeStamp;
     }
 
@@ -34,11 +36,19 @@ public class StandardError {
     }
 
     public String getError() {
-        return Error;
+        return error;
     }
 
     public void setError(String error) {
-        Error = error;
+        this.error = error;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
     
     

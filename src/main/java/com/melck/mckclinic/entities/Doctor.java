@@ -29,7 +29,6 @@ public class Doctor implements Serializable{
 
     //@Column(unique = true)
     private String cpf;
-
     private String phoneNumber;
     private String email;
 

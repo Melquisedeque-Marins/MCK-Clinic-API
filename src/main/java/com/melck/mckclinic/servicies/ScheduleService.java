@@ -2,21 +2,16 @@ package com.melck.mckclinic.servicies;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.melck.mckclinic.dto.CreateScheduleDTO;
-import com.melck.mckclinic.entities.Doctor;
 import com.melck.mckclinic.entities.Schedule;
-import com.melck.mckclinic.entities.Specialty;
-import com.melck.mckclinic.entities.User;
 import com.melck.mckclinic.entities.enums.Status;
-import com.melck.mckclinic.entities.enums.Type;
 import com.melck.mckclinic.repositories.ScheduleRepository;
+import com.melck.mckclinic.servicies.exceptions.InvalidDateException;
 import com.melck.mckclinic.servicies.exceptions.ObjectNotFoundException;
 
 @Service
@@ -24,20 +19,13 @@ public class ScheduleService {
 
     private ScheduleRepository scheduleRepository;
 
-    private UserService userService;    
-
-    private DoctorService doctorService;
-
-    public ScheduleService(ScheduleRepository scheduleRepository, UserService userService,
-            DoctorService doctorService) {
+    public ScheduleService(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
-        this.userService = userService;
-        this.doctorService = doctorService;
     }
 
     @Transactional
-    public Schedule create(CreateScheduleDTO dto){
-        return scheduleRepository.save(convertToSchedule(dto));
+    public Schedule create(Schedule schedule){
+        return scheduleRepository.save(schedule);
     }
 
     @Transactional
@@ -57,32 +45,24 @@ public class ScheduleService {
         return schedule;    
     }
 
+    public Schedule update(Long id, Schedule scheduleToUpdate) {
+        Schedule schedule = findById(id); 
+        scheduleToUpdate.setId(schedule.getId());
+        return scheduleRepository.save(scheduleToUpdate);
+    }
+
     public void updateStatus( Long id) {
-        Optional<Schedule> schedule = scheduleRepository.findById(id);
-        schedule.ifPresent(sc ->  {
-            sc.setStatus(Status.CANCELED);   
-            scheduleRepository.save(sc);     
-        } );
+        Schedule schedule = findById(id); 
+        schedule.setStatus(Status.CONFIRMED);
+        scheduleRepository.save(schedule);
     }
-    
+
     public void delete(Long id) {
-        Optional<Schedule> schedule = scheduleRepository.findById(id);
-        schedule.ifPresent(sc -> scheduleRepository.delete(sc));
-    }
-    
-    private Schedule convertToSchedule(CreateScheduleDTO dto) {
-        User user = userService.findById(dto.getUserId());
-        Doctor doctor =doctorService.findById(dto.getDoctorId());
-        Specialty specialty = new Specialty();
-        specialty.setDescription(doctor.getSpecialty().getDescription());
-        Schedule schedule = new Schedule();
-        schedule.setStatus(Status.SCHEDULED);
-        schedule.setType(Type.CONSULT);
-        schedule.setScheduleDate(dto.getScheduleDate());
-        schedule.setMoment(LocalDateTime.now());
-        schedule.setDoctor(doctor);
-        schedule.setUser(user);
-        return schedule;
+        Schedule schedule = findById(id);
+        if(schedule.getScheduleDate().plusHours(8).isBefore(LocalDateTime.now()) || schedule.getStatus().equals(Status.CONFIRMED)){
+            throw new InvalidDateException("this record cannot be deleted, as it has already been");
+        }
+        scheduleRepository.delete(schedule);
     }
 
     /* 
@@ -97,6 +77,7 @@ public class ScheduleService {
         List<Schedule> schedule = scheduleRepository.findAllByDoctor(id_doctor);
         return schedule;
     }
+    
     
     Regra de negocio Patch update status: o cliente pode cancelar a consulta até 4 horas antes da mesma. O operador atualiza o status para confirmado assim que o cliente se apresenta no balcão.
     Verificar se o agendamento é uma consulta ou retorno.

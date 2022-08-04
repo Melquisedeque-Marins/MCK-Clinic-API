@@ -66,6 +66,7 @@ public class UserService {
         return list;  
     }
 
+    @Transactional
     public void update(Long id, User userToUpdate) {
         User user = findById(id);
         userToUpdate.setId(user.getId());
