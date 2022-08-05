@@ -28,10 +28,6 @@ public class Schedule implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "moment", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    private Instant moment;
-
     @Column(name = "schedule_date", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime scheduleDate;
@@ -52,6 +48,21 @@ public class Schedule implements Serializable {
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
+    @Column(name = "createdAt", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant createdAt;
+
+    @Column(name = "createdAt", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant updatedAt;
+
+    @PrePersist
+    public void prePersist(){
+        createdAt = Instant.now();
+    }
+
+    public void preUpdate(){
+        updatedAt = Instant.now();
+    }
+
     public Schedule() {
     }
 
@@ -64,7 +75,7 @@ public class Schedule implements Serializable {
     }
 
     public Instant getMoment() {
-        return moment;
+        return createdAt;
     }
 
     public LocalDateTime getScheduleDate() {
@@ -107,11 +118,13 @@ public class Schedule implements Serializable {
         this.doctor = doctor;
     }
 
-    @PrePersist
-    public void prePersist(){
-        moment = Instant.now();
+    public Instant getCreatedAt() {
+        return createdAt;
     }
-    
-   
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }  
+
     
 }

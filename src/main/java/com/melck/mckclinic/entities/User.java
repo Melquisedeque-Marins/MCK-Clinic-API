@@ -1,6 +1,7 @@
 package com.melck.mckclinic.entities;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,12 +39,28 @@ public class User implements Serializable{
     private String phoneNumber;
     private LocalDate birthDate;
 
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant createdAt;
+    
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant updatedAt;
+
     @Enumerated(EnumType.STRING)
     private Gender gender; 
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Schedule> schedules = new ArrayList<>();
+
+    @PrePersist
+    public void preCreated(){
+        createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void preupdated(){
+        updatedAt = Instant.now();
+    }
 
     public User() {
     }
@@ -116,6 +135,14 @@ public class User implements Serializable{
     
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
     @Override

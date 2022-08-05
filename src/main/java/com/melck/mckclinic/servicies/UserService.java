@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,13 +46,13 @@ public class UserService {
     }
 
     @Transactional
-    public List<User> findAll(User filtro){
+    public Page<User> findAllPaged(User filtro, PageRequest pageRequest){
         ExampleMatcher matcher = ExampleMatcher
                                             .matching()
                                             .withIgnoreCase()
                                             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example<User> example = Example.of(filtro, matcher);
-        List<User> users = userRepository.findAll(example);
+        Page<User> users = userRepository.findAll(example, pageRequest);
         return users;
     }
     

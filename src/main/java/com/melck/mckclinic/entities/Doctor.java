@@ -1,6 +1,7 @@
 package com.melck.mckclinic.entities;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -41,7 +44,23 @@ public class Doctor implements Serializable{
 
     @JsonIgnore
     @OneToMany(mappedBy = "doctor")
-    private List<Schedule> schedules = new ArrayList<>();   
+    private List<Schedule> schedules = new ArrayList<>();  
+    
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant createdAt;
+
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant updatedAt;
+
+    @PrePersist
+    public void preCreated(){
+        createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void preUpdatd(){
+        updatedAt = Instant.now();
+    }
 
     public Long getId() {
         return id;
@@ -107,6 +126,11 @@ public class Doctor implements Serializable{
         this.email = email;
     }
 
-    
-    
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 }

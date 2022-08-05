@@ -1,7 +1,6 @@
 package com.melck.mckclinic.servicies;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -37,14 +36,13 @@ public class ScheduleService {
     }
     
     @Transactional
-    public Page<Schedule> findAll(PageRequest pagerequest, Schedule filtro) {
-        PageRequest pageable = pagerequest;
+    public Page<Schedule> findAll(PageRequest pageRequest, Schedule filtro) {
         ExampleMatcher matcher = ExampleMatcher
                                     .matching()
                                     .withIgnoreCase()
                                     .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example<Schedule> example = Example.of(filtro, matcher);
-        Page<Schedule> schedule = scheduleRepository.findAll(example, pageable);
+        Page<Schedule> schedule = scheduleRepository.findAll(example, pageRequest);
         return schedule;    
     }
 
