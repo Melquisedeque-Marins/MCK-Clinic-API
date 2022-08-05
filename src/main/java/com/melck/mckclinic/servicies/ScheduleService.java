@@ -1,6 +1,8 @@
 package com.melck.mckclinic.servicies;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -26,6 +28,17 @@ public class ScheduleService {
 
     @Transactional
     public Schedule create(Schedule schedule){
+        if(schedule.getScheduleDate().isBefore(LocalDateTime.now())){
+            throw new InvalidDateException("enter a valid date");
+        }
+
+        List<Schedule> perDoctor = scheduleRepository.findByDoctor(schedule.getDoctor());
+        List<Schedule> listSameDate = perDoctor.stream()
+                                        .filter(s -> s.getScheduleDate().equals(schedule.getScheduleDate()))
+                                        .collect(Collectors.toList());
+        if(!listSameDate.isEmpty()){
+            throw new InvalidDateException("this date " + schedule.getScheduleDate() + " is no longer available");
+        }
         return scheduleRepository.save(schedule);
     }
 

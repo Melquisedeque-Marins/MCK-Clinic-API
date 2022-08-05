@@ -64,13 +64,13 @@ public class ScheduleResource {
     @GetMapping
     public ResponseEntity<Page<ResponseScheduleDTO>> findAll(
         @RequestParam(value = "page", defaultValue = "0") Integer page,
-        @RequestParam(value = "linesPerPage", defaultValue = "10") Integer linesPerPage,
+        @RequestParam(value = "size", defaultValue = "10") Integer size,
         @RequestParam (value = "orderBy", defaultValue = "user.name") String orderBy,
         @RequestParam (value = "direction", defaultValue = "ASC") String direction,
         Schedule filtro
     
     ){
-        PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
+        PageRequest pageRequest = PageRequest.of(page, size, Direction.valueOf(direction), orderBy);
 
         Page<Schedule> schedule = scheduleService.findAll(pageRequest, filtro);
         Page<ResponseScheduleDTO> dto = schedule.map(sc -> convertToResponse(sc));

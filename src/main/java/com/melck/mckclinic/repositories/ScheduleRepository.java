@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.melck.mckclinic.entities.Doctor;
 import com.melck.mckclinic.entities.Schedule;
 
 @Repository
@@ -17,4 +18,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
 
     @Query ("SELECT dr FROM Schedule dr WHERE dr.doctor.id = :id_doctor ORDER BY scheduleDate ")
     List<Schedule> findAllByDoctor(@Param(value = "id_doctor") Long id_doctor);
+
+    List<Schedule> findByDoctor(Doctor doctor);
 }

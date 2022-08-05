@@ -48,10 +48,10 @@ public class Schedule implements Serializable {
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
-    @Column(name = "createdAt", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private Instant createdAt;
 
-    @Column(name = "createdAt", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private Instant updatedAt;
 
     @PrePersist
