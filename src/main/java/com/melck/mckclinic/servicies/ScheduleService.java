@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,13 +37,14 @@ public class ScheduleService {
     }
     
     @Transactional
-    public List<Schedule> findAll(Schedule filtro) {
+    public Page<Schedule> findAll(PageRequest pagerequest, Schedule filtro) {
+        PageRequest pageable = pagerequest;
         ExampleMatcher matcher = ExampleMatcher
                                     .matching()
                                     .withIgnoreCase()
                                     .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example<Schedule> example = Example.of(filtro, matcher);
-        List<Schedule> schedule = scheduleRepository.findAll(example);
+        Page<Schedule> schedule = scheduleRepository.findAll(example, pageable);
         return schedule;    
     }
 

@@ -9,6 +9,6 @@ INSERT INTO tb_user (name, cpf, email, phone_number, password, birth_date, gende
 INSERT INTO tb_user (name, cpf, email, phone_number, password, birth_date, gender)  VALUES ('Raissa Natasha Einstein França Amaral Marins', '01748583366', 'raissa@gmail.com', '+351935893142', '12345678', '1986-07-18', 'FEMALE');
 
 INSERT INTO tb_schedule (moment, schedule_date, status, type, doctor_id, user_id) VALUES (NOW(), '2022-08-05 10:00:00Z', 'SCHEDULED', 'CONSULT', 1L, 1L);
-INSERT INTO tb_schedule (moment, schedule_date, status, type, doctor_id, user_id) VALUES ('2022-08-04 20:02:00Z', '2022-08-05 10:20:00Z', 'SCHEDULED', 'CONSULT', 1L, 2L);
+INSERT INTO tb_schedule (moment, schedule_date, status, type, doctor_id, user_id) VALUES ('2022-08-04 20:02:00Z', '2022-08-10 10:20:00Z', 'SCHEDULED', 'CONSULT', 1L, 2L);
 INSERT INTO tb_schedule (moment, schedule_date, status, type, doctor_id, user_id) VALUES ('2022-08-04 20:00:00Z', '2022-08-05 10:00:00Z', 'SCHEDULED', 'CONSULT', 2L, 1L);
 INSERT INTO tb_schedule (moment, schedule_date, status, type, doctor_id, user_id) VALUES ('2022-08-04 20:02:00Z', '2022-08-05 10:20:00Z', 'SCHEDULED', 'CONSULT', 2L, 2L);

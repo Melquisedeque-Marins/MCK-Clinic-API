@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -60,9 +64,18 @@ public class ScheduleResource {
     }
 
     @GetMapping
-    public ResponseEntity<List<ResponseScheduleDTO>> findAll(Schedule filtro){
-        List<Schedule> schedule = scheduleService.findAll(filtro);
-        List<ResponseScheduleDTO> dto = schedule.stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
+    public ResponseEntity<Page<ResponseScheduleDTO>> findAll(
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "linesPerPage", defaultValue = "10") Integer linesPerPage,
+        @RequestParam (value = "orderBy", defaultValue = "user.name") String orderBy,
+        @RequestParam (value = "direction", defaultValue = "ASC") String direction,
+        Schedule filtro
+    
+    ){
+        PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
+
+        Page<Schedule> schedule = scheduleService.findAll(pageRequest, filtro);
+        Page<ResponseScheduleDTO> dto = schedule.map(sc -> convertToResponse(sc));
         return ResponseEntity.ok().body(dto);
     }
     
