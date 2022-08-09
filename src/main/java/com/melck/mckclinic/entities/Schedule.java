@@ -66,6 +66,17 @@ public class Schedule implements Serializable {
     public Schedule() {
     }
 
+    
+
+    public Schedule(Long id, LocalDateTime scheduleDate, Status status, Type type, User user, Doctor doctor) {
+        this.id = id;
+        this.scheduleDate = scheduleDate;
+        this.status = status;
+        this.type = type;
+        this.user = user;
+        this.doctor = doctor;
+    }
+
     public Long getId() {
         return id;
     }

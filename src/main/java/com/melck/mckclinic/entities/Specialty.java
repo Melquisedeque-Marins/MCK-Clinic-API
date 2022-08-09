@@ -27,6 +27,16 @@ public class Specialty implements Serializable{
     @OneToMany(mappedBy = "specialty")
     private List<Doctor> doctors = new ArrayList<>();
 
+    
+
+    public Specialty() {
+    }
+
+    public Specialty(Long id, String description) {
+        this.id = id;
+        this.description = description;
+    }
+
     public Long getId() {
         return id;
     }

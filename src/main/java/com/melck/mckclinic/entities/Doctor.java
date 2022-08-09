@@ -62,6 +62,20 @@ public class Doctor implements Serializable{
         updatedAt = Instant.now();
     }
 
+    public Doctor() {
+    }
+
+    public Doctor(Long id, String name, String cpf, String phoneNumber, String email, String registry,
+            Specialty specialty) {
+        this.id = id;
+        this.name = name;
+        this.cpf = cpf;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.registry = registry;
+        this.specialty = specialty;
+    }
+
     public Long getId() {
         return id;
     }
