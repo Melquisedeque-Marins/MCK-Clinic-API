@@ -76,9 +76,9 @@ public class UserService {
     }
     
     public void delete(Long id) {
-        User user = findById(id);
+        findById(id);
         try {
-            userRepository.delete(user);
+            userRepository.deleteById(id);
             
         } catch (DataIntegrityViolationException e) {
             throw new com.melck.mckclinic.servicies.exceptions.DataIntegrityViolationException
