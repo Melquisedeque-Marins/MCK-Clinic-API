@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +39,19 @@ public class ScheduleService {
         if(!listSameDate.isEmpty()){
             throw new InvalidDateException("this date " + schedule.getScheduleDate() + " is no longer available");
         }
+
+        List<Schedule> perUser = scheduleRepository.findByUser(schedule.getUser());
+        List<Schedule> listSameUser = perUser.stream()
+                                        .filter(s -> s.getScheduleDate().equals(schedule.getScheduleDate()))
+                                        .collect(Collectors.toList());
+        if(!listSameUser.isEmpty()){
+            String doctorName = listSameUser.get(0).getDoctor().getName();
+            throw new InvalidDateException("You have an schedule with the doctor " + doctorName + " for the time " + schedule.getScheduleDate());
+}
+
+
+
+
         return scheduleRepository.save(schedule);
     }
 
@@ -49,13 +62,13 @@ public class ScheduleService {
     }
     
     @Transactional
-    public Page<Schedule> findAll(PageRequest pageRequest, Schedule filtro) {
+    public Page<Schedule> findAll(Pageable pageable, Schedule filtro) {
         ExampleMatcher matcher = ExampleMatcher
                                     .matching()
                                     .withIgnoreCase()
                                     .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example<Schedule> example = Example.of(filtro, matcher);
-        Page<Schedule> schedule = scheduleRepository.findAll(example, pageRequest);
+        Page<Schedule> schedule = scheduleRepository.findAll(example, pageable);
         return schedule;    
     }
 

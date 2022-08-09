@@ -2,6 +2,7 @@ package com.melck.mckclinic.dto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.br.CPF;
@@ -28,6 +29,7 @@ public class CreateDoctorDTO {
     @NotEmpty(message = "the cpf field cannot be empty")
     private String cpf;
 
+    @NotNull
     private Long specialtyId;
 
     public String getName() {

@@ -9,7 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,13 +46,13 @@ public class UserService {
     }
 
     @Transactional
-    public Page<User> findAllPaged(User filtro, PageRequest pageRequest){
+    public Page<User> findAllPaged(User filtro, Pageable pageable){
         ExampleMatcher matcher = ExampleMatcher
                                             .matching()
                                             .withIgnoreCase()
                                             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example<User> example = Example.of(filtro, matcher);
-        Page<User> users = userRepository.findAll(example, pageRequest);
+        Page<User> users = userRepository.findAll(example, pageable);
         return users;
     }
     

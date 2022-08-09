@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.melck.mckclinic.entities.Doctor;
 import com.melck.mckclinic.entities.Schedule;
+import com.melck.mckclinic.entities.User;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
@@ -20,4 +21,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
     List<Schedule> findAllByDoctor(@Param(value = "id_doctor") Long id_doctor);
 
     List<Schedule> findByDoctor(Doctor doctor);
+
+    List<Schedule> findByUser(User user);
 }
