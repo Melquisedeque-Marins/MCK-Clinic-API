@@ -4,17 +4,13 @@ import java.time.Instant;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.melck.mckclinic.servicies.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import com.melck.mckclinic.servicies.exceptions.DataIntegrityViolationException;
-import com.melck.mckclinic.servicies.exceptions.InvalidDateException;
-import com.melck.mckclinic.servicies.exceptions.ObjectIsAlreadyInUseException;
-import com.melck.mckclinic.servicies.exceptions.ObjectNotFoundException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -40,7 +36,7 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    @ExceptionHandler(InvalidDateException .class)
+    @ExceptionHandler(InvalidDateException.class)
     public ResponseEntity<StandardError> invalidDateException(InvalidDateException e, HttpServletRequest request){
         StandardError error = new StandardError(now, HttpStatus.BAD_REQUEST.value(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -55,6 +51,17 @@ public class ControllerExceptionHandler {
             error.addErrors(x.getField(), x.getDefaultMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<OauthCustomError> forbidden(ForbiddenException e, HttpServletRequest request){
+        OauthCustomError error = new OauthCustomError("Forbidden", e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<OauthCustomError> unauthorized(UnauthorizedException e, HttpServletRequest request){
+        OauthCustomError error = new OauthCustomError("Unauthorized", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
 }

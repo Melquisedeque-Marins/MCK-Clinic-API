@@ -45,25 +45,24 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public ResponseUserDTO save(CreateUserDTO userDTO){
+
+        if (userRepository.findByCpf(userDTO.getCpf()) != null){
+            throw new ObjectIsAlreadyInUseException("cpf number: " + userDTO.getCpf() + " is already in use");
+        }
         var user = modelMapper.map(userDTO, User.class);
-        if (userRepository.findByCpf(user.getCpf()) != null){
-            throw new ObjectIsAlreadyInUseException("cpf number: " + user.getCpf() + " is already in use");
-        }
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        for (RoleDTO roleDto : userDTO.getRolesDTO()) {
-            Role role = roleRepository.getOne(roleDto.getId());
-            user.getRoles().add(role);
-        }
+        Role role = roleRepository.getOne(1L);
+        user.getRoles().add(role);
         return modelMapper.map(userRepository.save(user), ResponseUserDTO.class);
     }
 
     @Transactional
-    public Page<ListResponseUserDTO> findAllPaged(User filtro, Pageable pageable){
+    public Page<ListResponseUserDTO> findAllPaged(User filter, Pageable pageable){
         ExampleMatcher matcher = ExampleMatcher
                                             .matching()
                                             .withIgnoreCase()
                                             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-        Example<User> example = Example.of(filtro, matcher);
+        Example<User> example = Example.of(filter, matcher);
         Page<User> users = userRepository.findAll(example, pageable);
         Page<ListResponseUserDTO> listDTO = users.map(user -> modelMapper.map(user, ListResponseUserDTO.class));
         return listDTO;
