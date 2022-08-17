@@ -28,7 +28,7 @@ public class AuthService {
     public void validateSelfOrAdmin(Long userId){
         var user = authenticated();
 
-        if(!user.getId().equals(repository.findById(userId)) && !user.hasRole("ROLE_ADMIN")){
+        if(!user.getId().equals(userId) && !user.hasRole("ROLE_ADMIN")){
             throw new ForbiddenException("Access denied");
         }
     }

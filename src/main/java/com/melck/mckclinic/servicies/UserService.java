@@ -16,6 +16,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -43,6 +44,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private AuthService authService;
+
     @Transactional
     public ResponseUserDTO save(CreateUserDTO userDTO){
 
@@ -57,6 +61,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Page<ListResponseUserDTO> findAllPaged(User filter, Pageable pageable){
         ExampleMatcher matcher = ExampleMatcher
                                             .matching()
@@ -70,6 +75,7 @@ public class UserService implements UserDetailsService {
     
     @Transactional
     public User findById(Long id) {
+        authService.validateSelfOrAdmin(id);
         Optional<User> user = userRepository.findById(id);
         return user.orElseThrow(() -> new ObjectNotFoundException("the user with id : " + id + " not be founded"));
     }
@@ -82,6 +88,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void update(Long id, CreateUserDTO dto) {
+        authService.validateSelfOrAdmin(id);
         var userToUpdate = modelMapper.map(dto, User.class);
         User user = findById(id);
         userToUpdate.setId(user.getId());

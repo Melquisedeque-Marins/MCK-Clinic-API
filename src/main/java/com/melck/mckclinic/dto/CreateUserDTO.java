@@ -37,7 +37,7 @@ public class CreateUserDTO implements Serializable{
     private String cpf;
 
     @NotBlank(message = "the password field cannot be empty")
-    @Size(min = 6, max = 8)
+    @Size(min = 8, max = 8)
     private String password;
 
     @NotEmpty(message = "the phone number field cannot be empty")
