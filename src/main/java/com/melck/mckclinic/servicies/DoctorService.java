@@ -3,6 +3,9 @@ package com.melck.mckclinic.servicies;
 import java.util.List;
 import java.util.Optional;
 
+import com.melck.mckclinic.dto.CreateDoctorDTO;
+import com.melck.mckclinic.dto.ResponseDoctorDTO;
+import com.melck.mckclinic.entities.Specialty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -16,17 +19,21 @@ import com.melck.mckclinic.servicies.exceptions.ObjectNotFoundException;
 @Service
 public class DoctorService {
 
+    private SpecialtyService specialtyService;
+
     private DoctorRepository doctorRepository;
 
-    public DoctorService(DoctorRepository doctorRepository) {
+    public DoctorService(SpecialtyService specialtyService, DoctorRepository doctorRepository) {
+        this.specialtyService = specialtyService;
         this.doctorRepository = doctorRepository;
     }
-    
-    public Doctor save(Doctor doctor) {
-        if (doctorRepository.findByCpf(doctor.getCpf()).isPresent()){
-            throw new ObjectIsAlreadyInUseException("cpf number: " + doctor.getCpf() + " is already in use");
+
+    public ResponseDoctorDTO save(CreateDoctorDTO createDoctorDTO) {
+        Doctor doctorToSave = converteToDoctor(createDoctorDTO);
+        if (doctorRepository.findByCpf(doctorToSave.getCpf()).isPresent()){
+            throw new ObjectIsAlreadyInUseException("cpf number: " + doctorToSave.getCpf() + " is already in use");
         }
-        return doctorRepository.save(doctor);
+        return convertToResponseDoctorDTO(doctorRepository.save(doctorToSave));
     }
     
     public Doctor findById(long id){
@@ -45,7 +52,8 @@ public class DoctorService {
         return doctors;
     }
 
-    public Doctor update(Long id, Doctor doctorToUpdate) {
+    public Doctor update(Long id, CreateDoctorDTO dto) {
+        var doctorToUpdate = converteToDoctor(dto);
         Doctor doctor = findById(id);
         doctorToUpdate.setId(doctor.getId());
         return doctorRepository.save(doctorToUpdate);
@@ -62,7 +70,30 @@ public class DoctorService {
             ("this doctor cannot be deleted. it has linked schedules.");
         }
     }
-    
+
+    private Doctor converteToDoctor(CreateDoctorDTO createDoctorDTO) {
+        Specialty specialty = specialtyService.findById(createDoctorDTO.getSpecialtyId());
+        Doctor doctor = new Doctor();
+        doctor.setName(createDoctorDTO.getName());
+        doctor.setRegistry(createDoctorDTO.getRegistry());
+        doctor.setSpecialty(specialty);
+        doctor.setCpf(createDoctorDTO.getCpf());
+        doctor.setEmail(createDoctorDTO.getEmail());
+        doctor.setPhoneNumber(createDoctorDTO.getPhoneNumber());
+        return doctor;
+    }
+
+    private ResponseDoctorDTO convertToResponseDoctorDTO(Doctor doctor) {
+        ResponseDoctorDTO dto = new ResponseDoctorDTO();
+        dto.setId(doctor.getId());
+        dto.setName(doctor.getName());
+        dto.setRegistry(doctor.getRegistry());
+        dto.setSpecialty(doctor.getSpecialty().getDescription());
+        dto.setCpf(doctor.getCpf());
+        dto.setEmail(doctor.getEmail());
+        dto.setPhoneNumber(doctor.getPhoneNumber());
+        return dto;
+    }
     /*
     public List<Doctor> findAllBySpecialty(Long id_specialty) {
         specialtyService.findById(id_specialty);

@@ -9,6 +9,6 @@ import com.melck.mckclinic.entities.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
-    
-    Optional<User> findByCpf(String cpf);
+
+    User findByCpf(String cpf);
 }

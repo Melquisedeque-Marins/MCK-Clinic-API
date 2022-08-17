@@ -2,10 +2,15 @@ package com.melck.mckclinic.dto;
 
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class CreateScheduleDTO {
     
+    @NotNull(message = "the scheduleDate field cannot be empty")
+    @Future(message = "enter a valid date")
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime scheduleDate;
     private Long doctorId;

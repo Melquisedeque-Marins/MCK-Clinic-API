@@ -2,12 +2,34 @@ package com.melck.mckclinic.dto;
 
 public class ResponseDoctorDTO {
 
+    private Long id;
     private String name;
     private String registry;
     private String specialty;
     private String cpf;
     private String email;
     private String phoneNumber;
+
+    public ResponseDoctorDTO() {
+    }
+
+    public ResponseDoctorDTO(Long id, String name, String registry, String specialty, String cpf, String email, String phoneNumber) {
+        this.id = id;
+        this.name = name;
+        this.registry = registry;
+        this.specialty = specialty;
+        this.cpf = cpf;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

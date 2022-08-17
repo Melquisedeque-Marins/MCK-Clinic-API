@@ -30,61 +30,48 @@ import com.melck.mckclinic.servicies.UserService;
 @RestController
 @RequestMapping("/users")
 public class UserResource {
-    
+
     private ModelMapper modelMapper;
-    
+
     public UserResource(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
-    
+
     @Autowired
     private UserService userService;
-    
+
     @PostMapping
-    public ResponseEntity<User> create(@Valid @RequestBody CreateUserDTO userDTO){
-        var user = modelMapper.map(userDTO, User.class);
-        var newUser = userService.save(user);
+    public ResponseEntity<User> create(@Valid @RequestBody CreateUserDTO userDTO) {
+        var newUser = userService.save(userDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path(("/{id}")).buildAndExpand(newUser.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
-    
-     @GetMapping("/{id}")
-     public ResponseEntity<ResponseUserDTO> findById(@PathVariable Long id){
-         var user = userService.findById(id);
-         ResponseUserDTO dto = modelMapper.map(user, ResponseUserDTO.class);
-         Long years = ChronoUnit.YEARS.between(user.getBirthDate(), LocalDate.now());
-         dto.setAge(years);
-         return ResponseEntity.ok().body(dto);
-     }
 
-    @GetMapping
-    public ResponseEntity<Page<ListResponseUserDTO>> findAll(User filtro, Pageable pageable){
-        Page<User> list = userService.findAllPaged(filtro, pageable);
-        Page<ListResponseUserDTO> listDTO = list.map(user -> modelMapper.map(user, ListResponseUserDTO.class));                         
-        return ResponseEntity.ok().body(listDTO);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody @Valid CreateUserDTO dto){
-        var userToUpdate = modelMapper.map(dto, User.class);
-        userService.update(id, userToUpdate);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<User> delete(@PathVariable Long id){
-        userService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    /*
-    @GetMapping("/{cpf}")
-    public ResponseEntity<ResponseUserDTO> findByCpf(@PathVariable String cpf){
-        User user = userService.findByCpf(cpf);
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseUserDTO> findById(@PathVariable Long id) {
+        var user = userService.findById(id);
         ResponseUserDTO dto = modelMapper.map(user, ResponseUserDTO.class);
         Long years = ChronoUnit.YEARS.between(user.getBirthDate(), LocalDate.now());
         dto.setAge(years);
         return ResponseEntity.ok().body(dto);
     }
-      */
+
+    @GetMapping
+    public ResponseEntity<Page<ListResponseUserDTO>> findAll(User filtro, Pageable pageable) {
+        Page<ListResponseUserDTO> list = userService.findAllPaged(filtro, pageable);
+        return ResponseEntity.ok().body(list);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody @Valid CreateUserDTO dto) {
+        userService.update(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> delete(@PathVariable Long id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

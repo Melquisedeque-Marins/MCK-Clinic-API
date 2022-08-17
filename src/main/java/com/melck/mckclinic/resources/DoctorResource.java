@@ -39,9 +39,8 @@ public class DoctorResource {
     }
 
     @PostMapping
-    public ResponseEntity<Doctor> create(@Valid @RequestBody  CreateDoctorDTO createDoctorDTO){
-        Doctor doctorToSave = converteToDoctor(createDoctorDTO);
-        Doctor doctor = doctorService.save(doctorToSave);
+    public ResponseEntity<ResponseDoctorDTO> create(@Valid @RequestBody  CreateDoctorDTO createDoctorDTO){
+        ResponseDoctorDTO doctor = doctorService.save(createDoctorDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/doctors/{id}").buildAndExpand(doctor.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
@@ -65,8 +64,8 @@ public class DoctorResource {
 
     @PutMapping("/{id}")
     public ResponseEntity<Doctor> update(@PathVariable Long id, @RequestBody @Valid CreateDoctorDTO dto){
-        var doctorToUpdate = converteToDoctor(dto);
-        doctorService.update(id, doctorToUpdate);
+
+        doctorService.update(id, dto);
         return ResponseEntity.ok().build();
     }
 
@@ -76,17 +75,7 @@ public class DoctorResource {
         return ResponseEntity.noContent().build();
     }
     
-    private Doctor converteToDoctor(CreateDoctorDTO createDoctorDTO) {
-        Specialty specialty = specialtyService.findById(createDoctorDTO.getSpecialtyId());
-        Doctor doctor = new Doctor();
-        doctor.setName(createDoctorDTO.getName());
-        doctor.setRegistry(createDoctorDTO.getRegistry());
-        doctor.setSpecialty(specialty);
-        doctor.setCpf(createDoctorDTO.getCpf());
-        doctor.setEmail(createDoctorDTO.getEmail());
-        doctor.setPhoneNumber(createDoctorDTO.getPhoneNumber());
-        return doctor;
-    }
+
 
     private ShortResponseDoctorDTO convertToShortResponseDoctorDTO(Doctor doctor) {
         ShortResponseDoctorDTO dto = new ShortResponseDoctorDTO();
@@ -98,6 +87,7 @@ public class DoctorResource {
     
     private ResponseDoctorDTO convertToResponseDoctorDTO(Doctor doctor) {
         ResponseDoctorDTO dto = new ResponseDoctorDTO();
+        dto.setId(doctor.getId());
         dto.setName(doctor.getName());
         dto.setRegistry(doctor.getRegistry());
         dto.setSpecialty(doctor.getSpecialty().getDescription());

@@ -1,59 +1,72 @@
 package com.melck.mckclinic.servicies;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.melck.mckclinic.dto.CreateUserDTO;
+import com.melck.mckclinic.dto.ListResponseUserDTO;
+import com.melck.mckclinic.dto.ResponseUserDTO;
+import com.melck.mckclinic.dto.RoleDTO;
+import com.melck.mckclinic.entities.Role;
+import com.melck.mckclinic.repositories.RoleRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.melck.mckclinic.entities.User;
 import com.melck.mckclinic.repositories.UserRepository;
-import com.melck.mckclinic.servicies.exceptions.InvalidDateException;
 import com.melck.mckclinic.servicies.exceptions.ObjectIsAlreadyInUseException;
 import com.melck.mckclinic.servicies.exceptions.ObjectNotFoundException;
 
 @Service
-public class UserService {
-    
+public class UserService implements UserDetailsService {
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Transactional
-    public User save(User user){
-       
-        if (userRepository.findByCpf(user.getCpf()).isPresent()){
+    public ResponseUserDTO save(CreateUserDTO userDTO){
+        var user = modelMapper.map(userDTO, User.class);
+        if (userRepository.findByCpf(user.getCpf()) != null){
             throw new ObjectIsAlreadyInUseException("cpf number: " + user.getCpf() + " is already in use");
         }
-        LocalDate birth = user.getBirthDate();
-        LocalDate now = LocalDate.now();
-        if(birth.isAfter(now)){
-            throw new InvalidDateException("check the chosen date in the birthDate field");
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        for (RoleDTO roleDto : userDTO.getRolesDTO()) {
+            Role role = roleRepository.getOne(roleDto.getId());
+            user.getRoles().add(role);
         }
-        return userRepository.save(user);
+        return modelMapper.map(userRepository.save(user), ResponseUserDTO.class);
     }
 
     @Transactional
-    public User findByCpf(String cpf) {
-        Optional<User> user = userRepository.findByCpf(cpf);
-        return user.orElseThrow(() -> new ObjectNotFoundException("the user with cpf : " + cpf + " not be founded"));
-    }
-
-    @Transactional
-    public Page<User> findAllPaged(User filtro, Pageable pageable){
+    public Page<ListResponseUserDTO> findAllPaged(User filtro, Pageable pageable){
         ExampleMatcher matcher = ExampleMatcher
                                             .matching()
                                             .withIgnoreCase()
                                             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example<User> example = Example.of(filtro, matcher);
         Page<User> users = userRepository.findAll(example, pageable);
-        return users;
+        Page<ListResponseUserDTO> listDTO = users.map(user -> modelMapper.map(user, ListResponseUserDTO.class));
+        return listDTO;
     }
     
     @Transactional
@@ -69,7 +82,8 @@ public class UserService {
     }
 
     @Transactional
-    public void update(Long id, User userToUpdate) {
+    public void update(Long id, CreateUserDTO dto) {
+        var userToUpdate = modelMapper.map(dto, User.class);
         User user = findById(id);
         userToUpdate.setId(user.getId());
         userRepository.save(userToUpdate);
@@ -86,18 +100,12 @@ public class UserService {
         }
     }
 
-
-    /*
-    @Transactional 
-    public void deleteByCpf(String cpf) {
-        User user = findByCpf(cpf);
-        try {
-            userRepository.delete(user);
-            
-        } catch (DataIntegrityViolationException e) {
-            throw new com.melck.mckclinic.servicies.exceptions.DataIntegrityViolationException
-                                ("this user cannot be deleted. it has linked schedules.");
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByCpf(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("cpf not found");
         }
+        return user;
     }
-     */
 }

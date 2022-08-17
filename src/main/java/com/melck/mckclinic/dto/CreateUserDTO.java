@@ -2,11 +2,18 @@ package com.melck.mckclinic.dto;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
+
+import com.melck.mckclinic.entities.User;
 import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,7 +24,7 @@ public class CreateUserDTO implements Serializable{
 
     private Long id;
 
-    @NotEmpty(message = "the name field cannot be empty")
+    @NotBlank(message = "the name field cannot be empty")
     @Size(min = 5, max = 100)
     private String name;
 
@@ -26,23 +33,26 @@ public class CreateUserDTO implements Serializable{
     private String email;
 
     @CPF
-    @NotEmpty(message = "the cpf field cannot be empty")
+    @NotBlank(message = "the cpf field cannot be empty")
     private String cpf;
 
-    @NotEmpty(message = "the password field cannot be empty")
-    @Size(min = 8, max = 8)
+    @NotBlank(message = "the password field cannot be empty")
+    @Size(min = 6, max = 8)
     private String password;
 
-    @NotEmpty(message = "the phonenumber field cannot be empty")
+    @NotEmpty(message = "the phone number field cannot be empty")
     @Size(min = 13, max = 15)
     private String phoneNumber;
 
-    @NotNull(message = "the bithdate field cannot be empty")
+    @NotNull(message = "the birth date field cannot be empty")
+    @Past(message = "enter a valid date of birth")
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthDate;
 
     @NotNull(message = "Choose one of the options for gender field")
     private Gender gender;
+
+    private Set<RoleDTO> rolesDTO = new HashSet<>();
 
     public CreateUserDTO() {
     }
@@ -57,6 +67,17 @@ public class CreateUserDTO implements Serializable{
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
         this.gender = gender;
+    }
+    public CreateUserDTO(User user) {
+        this.id = user.getId();
+        this.name = user.getName();
+        this.email = user.getEmail();
+        this.cpf = user.getCpf();
+        this.password = user.getPassword();
+        this.phoneNumber = user.getPhoneNumber();
+        this.birthDate = user.getBirthDate();
+        gender = user.getGender();
+        rolesDTO = user.getRoles().stream().map(r -> new RoleDTO(r)).collect(Collectors.toSet());
     }
 
     public Long getId() {
@@ -122,6 +143,10 @@ public class CreateUserDTO implements Serializable{
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public Set<RoleDTO> getRolesDTO() {
+        return rolesDTO;
     }
 
     @Override

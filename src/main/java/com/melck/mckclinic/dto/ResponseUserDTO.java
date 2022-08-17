@@ -2,12 +2,15 @@ package com.melck.mckclinic.dto;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.melck.mckclinic.entities.enums.Gender;
 
 public class ResponseUserDTO implements Serializable{
-    
+
+    private Long id;
+
     private String name;
     private String email;
     private String cpf;
@@ -22,8 +25,9 @@ public class ResponseUserDTO implements Serializable{
     public ResponseUserDTO() {
     }
 
-    public ResponseUserDTO( String name, String email, String cpf, String phoneNumber, Long age, Gender gender,
+    public ResponseUserDTO( Long id, String name, String email, String cpf, String phoneNumber, Long age, Gender gender,
             LocalDate birthDate) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
@@ -81,6 +85,14 @@ public class ResponseUserDTO implements Serializable{
         this.age = age;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Gender getGender() {
         return gender;
     }
@@ -88,5 +100,17 @@ public class ResponseUserDTO implements Serializable{
     public void setGender(Gender gender) {
         this.gender = gender;
     }
-   
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ResponseUserDTO)) return false;
+        ResponseUserDTO that = (ResponseUserDTO) o;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }
