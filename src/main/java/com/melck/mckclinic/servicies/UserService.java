@@ -48,7 +48,7 @@ public class UserService implements UserDetailsService {
     private AuthService authService;
 
     @Transactional
-    public ResponseUserDTO save(CreateUserDTO userDTO){
+    public ResponseUserDTO insert(CreateUserDTO userDTO){
 
         if (userRepository.findByCpf(userDTO.getCpf()) != null){
             throw new ObjectIsAlreadyInUseException("cpf number: " + userDTO.getCpf() + " is already in use");
@@ -89,6 +89,10 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void update(Long id, CreateUserDTO dto) {
         authService.validateSelfOrAdmin(id);
+        User entity = userRepository.findByCpf(dto.getCpf());
+        if (entity != null && entity.getId() != id ){
+            throw new ObjectIsAlreadyInUseException("cpf number: " + dto.getCpf() + " is already in use");
+        }
         var userToUpdate = modelMapper.map(dto, User.class);
         User user = findById(id);
         userToUpdate.setId(user.getId());

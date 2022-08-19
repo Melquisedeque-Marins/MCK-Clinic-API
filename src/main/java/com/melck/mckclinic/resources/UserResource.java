@@ -42,7 +42,7 @@ public class UserResource {
 
     @PostMapping
     public ResponseEntity<User> create(@Valid @RequestBody CreateUserDTO userDTO) {
-        var newUser = userService.save(userDTO);
+        var newUser = userService.insert(userDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path(("/{id}")).buildAndExpand(newUser.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
