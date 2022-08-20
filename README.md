@@ -1,20 +1,23 @@
 # MCK-Clinic
-
+<a id="Sobre"></a>
 ## API REST desenvolvida em Java e SpringBoot para uma plataforma de agendamento de consultas e gerenciamento de pacientes destinada à clínicas médicas.
 
 ![Badge em Desenvolvimento](http://img.shields.io/static/v1?label=STATUS&message=EM%20DESENVOLVIMENTO&color=GREEN&style=for-the-badge)
 
+<a id="Indice"></a>
 ## Índice
 <!--ts-->
 * [Sobre](#Sobre)
-* [Índice](#Índice)
+* [Índice](#Indice)
 * [Funcionalidades](#Funcionalidades)
-* [Tecnologias utilizadas](#Tecnologias utilizadas)
-* [Acesso ao projeto](#Acesso ao projeto)
-* [Pré-requisitos](#Pré-requisitos)
-* [Instruções para download e execução do projeto](#Instruções para download e execução do projeto)
+* [Tecnologias utilizadas](#Tecnologias)
+* [Acesso ao projeto](#Acesso_ao_projeto)
+* [Pré-requisitos](#Pre-requisitos)
+* [Instruções para download e execução do projeto](#Instruções)
+* [Autor](#Autor)
 <!--te-->
 
+<a id="Funcionalidades"></a>
 ## 🔨 Funcionalidades 
 - Segurança com autenticação e autorização utilizando token JWT utilizando protocolo Oauth2;
 - Cadastro de usuarios;
@@ -26,6 +29,7 @@
 - Confirmação da consulta pelo operador do sistema;
 - Envio de notificação de consulta agendada;
 
+<a id="Tecnologias"></a>
 ## 🛠️️ Tecnologias utilizadas
 
 - Java 17
@@ -36,16 +40,19 @@
 - Docker
 - InteliJ IDEA
 
+<a id="Acesso_ao_projeto"></a>
 ## 📁 Acesso ao projeto
 
 Você pode acessar os arquivos do projeto clicando [aqui](https://github.com/Melquisedeque-Marins/MCK-Clinic/tree/main/src).
 
+<a id="Pre-requisitos"></a>
 ## ✔ Pré-requisitos
 
 ✔️ **JDK 17** 
 
 ✔️ **Acesso a internet**
 
+<a id="Instruções"></a>
 ## 🎲️ Instruções para download e execução do projeto
 
 - Abra o terminal e navegue até o diretório onde deseja salvar o projeto
@@ -66,9 +73,10 @@ Você pode acessar os arquivos do projeto clicando [aqui](https://github.com/Mel
 
 **Para Facilitar a utilização desta API segue a collection do Postman com os endpoints disponíveis.**
 
+<a id="Autor"></a>
 ## Autor
 <a href="https://github.com/Melquisedeque-Marins">
- <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/93653645?v=4" width="100px;" alt=""/>
+ <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/93653645?v=4" border-radius=50%, width="100px;" alt=""/>
 <br />
  <sub><b>Melquisedeque Marins Junior</b></sub></a> <a href="https://www.linkedin.com/in/melquisedeque-marins-junior-324291230"></a>
 
