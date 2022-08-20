@@ -4,10 +4,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.melck.mckclinic.dto.CreateScheduleDTO;
+import com.melck.mckclinic.dto.ResponseScheduleDTO;
+import com.melck.mckclinic.dto.UpdateScheduleDTO;
+import com.melck.mckclinic.entities.Doctor;
+import com.melck.mckclinic.entities.User;
+import com.melck.mckclinic.entities.enums.Type;
+import com.melck.mckclinic.repositories.DoctorRepository;
+import com.melck.mckclinic.repositories.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,120 +27,147 @@ import com.melck.mckclinic.repositories.ScheduleRepository;
 import com.melck.mckclinic.servicies.exceptions.InvalidDateException;
 import com.melck.mckclinic.servicies.exceptions.ObjectNotFoundException;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 public class ScheduleService {
 
     private ScheduleRepository scheduleRepository;
 
-    public ScheduleService(ScheduleRepository scheduleRepository) {
+    private UserRepository userRepository;
+
+    private DoctorRepository doctorRepository;
+
+    private AuthService authService;
+
+    public ScheduleService(ScheduleRepository scheduleRepository, UserRepository userRepository, DoctorRepository doctorRepository, AuthService authService) {
         this.scheduleRepository = scheduleRepository;
+        this.userRepository = userRepository;
+        this.doctorRepository = doctorRepository;
+        this.authService = authService;
     }
 
     @Transactional
-    public Schedule create(Schedule schedule){
-        if(schedule.getScheduleDate().isBefore(LocalDateTime.now())){
-            throw new InvalidDateException("enter a valid date");
+    public ResponseScheduleDTO insert(CreateScheduleDTO dto){
+        try {
+            Schedule schedule = convertToSchedule(dto);
+            authService.validateSelfOrAdmin(schedule.getUser().getId());
+
+            if(schedule.getScheduleDate().isBefore(LocalDateTime.now())){
+                throw new InvalidDateException("enter a valid date");
+            }
+
+            List<Schedule> perDoctor = scheduleRepository.findByDoctor(schedule.getDoctor());
+            Schedule finalSchedule = schedule;
+            List<Schedule> listSameDate = perDoctor.stream()
+                    .filter(s -> s.getScheduleDate().equals(finalSchedule.getScheduleDate()))
+                    .collect(Collectors.toList());
+            if(!listSameDate.isEmpty()){
+                throw new InvalidDateException("this date " + schedule.getScheduleDate() + " is no longer available");
+            }
+
+            List<Schedule> perUser = scheduleRepository.findByUser(schedule.getUser());
+            Schedule finalSchedule1 = schedule;
+            List<Schedule> listSameUser = perUser.stream()
+                    .filter(s -> s.getScheduleDate().equals(finalSchedule1.getScheduleDate()))
+                    .collect(Collectors.toList());
+            if(!listSameUser.isEmpty()){
+                String doctorName = listSameUser.get(0).getDoctor().getName();
+                throw new InvalidDateException("You have an schedule with the doctor " + doctorName + " for the time " + schedule.getScheduleDate());
+            }
+            schedule.setStatus(Status.SCHEDULED);
+            schedule.setType(Type.CONSULT);
+            schedule = scheduleRepository.save(schedule);
+            return convertToResponse(schedule);
+        } catch (DataIntegrityViolationException e) {
+            throw new ObjectNotFoundException("Invalid User or Doctor");
         }
-
-        List<Schedule> perDoctor = scheduleRepository.findByDoctor(schedule.getDoctor());
-        List<Schedule> listSameDate = perDoctor.stream()
-                                        .filter(s -> s.getScheduleDate().equals(schedule.getScheduleDate()))
-                                        .collect(Collectors.toList());
-        if(!listSameDate.isEmpty()){
-            throw new InvalidDateException("this date " + schedule.getScheduleDate() + " is no longer available");
-        }
-
-        List<Schedule> perUser = scheduleRepository.findByUser(schedule.getUser());
-        List<Schedule> listSameUser = perUser.stream()
-                                        .filter(s -> s.getScheduleDate().equals(schedule.getScheduleDate()))
-                                        .collect(Collectors.toList());
-        if(!listSameUser.isEmpty()){
-            String doctorName = listSameUser.get(0).getDoctor().getName();
-            throw new InvalidDateException("You have an schedule with the doctor " + doctorName + " for the time " + schedule.getScheduleDate());
-}
-
-
-
-
-        return scheduleRepository.save(schedule);
     }
 
     @Transactional
-    public Schedule findById(Long id) {
-        return scheduleRepository.findById(id)
-        .orElseThrow(() -> new ObjectNotFoundException("the schedule with id: " + id + " not be founded"));
+    public ResponseScheduleDTO findById(Long id) {
+        Schedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("the schedule with id: " + id + " not be founded"));
+        authService.validateSelfOrAdmin(schedule.getUser().getId());
+        return convertToResponse(schedule);
     }
-    
+
     @Transactional
-    public Page<Schedule> findAll(Pageable pageable, Schedule filtro) {
+    public Page<ResponseScheduleDTO> findAll(Pageable pageable, Schedule filter) {
         ExampleMatcher matcher = ExampleMatcher
-                                    .matching()
-                                    .withIgnoreCase()
-                                    .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-        Example<Schedule> example = Example.of(filtro, matcher);
+                .matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example<Schedule> example = Example.of(filter, matcher);
         Page<Schedule> schedule = scheduleRepository.findAll(example, pageable);
-        return schedule;    
+        return schedule.map(sc -> convertToResponse(sc));
     }
 
-    public Schedule update(Long id, Schedule scheduleToUpdate) {
-        Schedule schedule = findById(id); 
-        scheduleToUpdate.setId(schedule.getId());
-        return scheduleRepository.save(scheduleToUpdate);
+    @Transactional
+    public ResponseScheduleDTO update(Long id, UpdateScheduleDTO dto) {
+        try {
+            Schedule scheduleToUpdate = convertUpdateToSchedule(dto);
+            Schedule schedule = scheduleRepository.getOne(id);
+            authService.validateSelfOrAdmin(schedule.getUser().getId());
+            if(schedule.getScheduleDate().isBefore(LocalDateTime.now()) || schedule.getStatus().equals(Status.CONFIRMED)){
+                throw new InvalidDateException("this record cannot be updated, as it has already been");
+            }
+            schedule.setDoctor(scheduleToUpdate.getDoctor());
+            schedule.setScheduleDate(scheduleToUpdate.getScheduleDate());
+            return convertToResponse(scheduleRepository.save(schedule));
+        } catch (EntityNotFoundException e) {
+            throw new ObjectNotFoundException("Schedule or doctor not found");
+        }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
     public void updateStatus( Long id) {
-        Schedule schedule = findById(id); 
+        authService.validateSelfOrAdmin(id);
+        Schedule schedule = scheduleRepository.getOne(id);
+        if(schedule.getScheduleDate().plusHours(8).isBefore(LocalDateTime.now()) || schedule.getStatus().equals(Status.CONFIRMED)){
+            throw new InvalidDateException("this record cannot be updated, as it has already been");
+        }
         schedule.setStatus(Status.CONFIRMED);
         scheduleRepository.save(schedule);
     }
 
     public void delete(Long id) {
-        Schedule schedule = findById(id);
+        Schedule schedule = scheduleRepository.findById(id).get();
+        authService.validateSelfOrAdmin(schedule.getUser().getId());
         if(schedule.getScheduleDate().plusHours(8).isBefore(LocalDateTime.now()) || schedule.getStatus().equals(Status.CONFIRMED)){
             throw new InvalidDateException("this record cannot be deleted, as it has already been");
         }
         scheduleRepository.delete(schedule);
     }
 
-    /* 
-    public List<Schedule> findAllByUser(Long id_user) {
-        userService.findById(id_user);
-        List<Schedule> schedule = scheduleRepository.findAllByUser(id_user);
+    private Schedule convertToSchedule(CreateScheduleDTO dto) {
+        User user = userRepository.getOne(dto.getUserId());
+        Doctor doctor = doctorRepository.getOne(dto.getDoctorId());
+        Schedule schedule = new Schedule();
+        schedule.setScheduleDate(dto.getScheduleDate());
+        schedule.setDoctor(doctor);
+        schedule.setUser(user);
         return schedule;
     }
-    
-    public List<Schedule> findAllByDoctor(Long id_doctor) {
-        doctorService.findById(id_doctor);
-        List<Schedule> schedule = scheduleRepository.findAllByDoctor(id_doctor);
+
+    private Schedule convertUpdateToSchedule(UpdateScheduleDTO dto) {
+        Doctor doctor =doctorRepository.getOne(dto.getDoctorId());
+        Schedule schedule = new Schedule();
+        schedule.setScheduleDate(dto.getScheduleDate());
+        schedule.setDoctor(doctor);
         return schedule;
     }
-    
-    
-    Regra de negocio Patch update status: o cliente pode cancelar a consulta até 4 horas antes da mesma. O operador atualiza o status para confirmado assim que o cliente se apresenta no balcão.
-    Verificar se o agendamento é uma consulta ou retorno.
-    List<Schedule> schedules = FindAllByUser(createScheduleDto.getUserId);
 
-    List<Schedule> schedulesDoctor = schedules.stream( )
-                                                .filter(schedule.getDoctor( )
-                                                .equals(createScheduleDto.getDoctor( )
-                                                 && schedule.getStatus.toString( )
-                                                 .equals("CONFIRMED") 
-                                                 && schedule.getType.toString( )
-                                                 .equals("CONSULT")).collect(Collectors( ).toList( );
-
-    If (!scheduleDoctor.isEmpty()){
-
-    for ( Schedule schedule : scheduleDoctor){
-    If(schedulesDoctor.getScheduleDate( ).plusDays(30).isAfter.LocalDate.now( )){
-
-    ScheduleToSave = convertCreateScheduleDtoToSchedule(createScheduleDto);
-
-    scheduleToSave.setType(Type.RETURN);
-    scheduleToSave.setStatus(Status.SCHEDULED);
-    scheduleRepository.save(scheduleToSave);
-    }
+    private ResponseScheduleDTO convertToResponse(Schedule schedule) {
+        ResponseScheduleDTO dto = new ResponseScheduleDTO();
+        dto.setId(schedule.getId());
+        dto.setDoctor(schedule.getDoctor().getName());
+        dto.setUser(schedule.getUser().getName());
+        dto.setSpecialty(schedule.getDoctor().getSpecialty().getDescription());
+        dto.setScheduleDate(schedule.getScheduleDate());
+        dto.setStatus(schedule.getStatus().toString());
+        dto.setType(schedule.getType().toString());
+        return dto;
     }
 }
-    */
-}
-

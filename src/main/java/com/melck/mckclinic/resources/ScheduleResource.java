@@ -4,9 +4,11 @@ import java.net.URI;
 
 import javax.validation.Valid;
 
+import com.melck.mckclinic.dto.UpdateScheduleDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,52 +22,38 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.melck.mckclinic.dto.CreateScheduleDTO;
 import com.melck.mckclinic.dto.ResponseScheduleDTO;
-import com.melck.mckclinic.entities.Doctor;
 import com.melck.mckclinic.entities.Schedule;
-import com.melck.mckclinic.entities.Specialty;
-import com.melck.mckclinic.entities.User;
-import com.melck.mckclinic.entities.enums.Status;
-import com.melck.mckclinic.entities.enums.Type;
-import com.melck.mckclinic.servicies.DoctorService;
 import com.melck.mckclinic.servicies.ScheduleService;
-import com.melck.mckclinic.servicies.UserService;
 
 @RestController
 @RequestMapping("/schedules")
 public class ScheduleResource {
-    
-    private UserService userService;
-    private DoctorService doctorService;
+
     private ScheduleService scheduleService;
 
-    public ScheduleResource(UserService userService, DoctorService doctorService, ScheduleService scheduleService) {
-        this.userService = userService;
-        this.doctorService = doctorService;
+    public ScheduleResource(ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
     }
 
     @PostMapping
-    public ResponseEntity<Schedule> create(@Valid @RequestBody CreateScheduleDTO dto){
-        Schedule scheduleToSave = convertToSchedule(dto);
-        Schedule newSchedule = scheduleService.create(scheduleToSave);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/schedules/{id}").buildAndExpand(newSchedule.getId()).toUri();
-        return ResponseEntity.created(uri).build();
+    public ResponseEntity<ResponseScheduleDTO> insert(@Valid @RequestBody CreateScheduleDTO dto){
+        ResponseScheduleDTO schedule = scheduleService.insert(dto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/schedules/{id}").buildAndExpand(schedule.getId()).toUri();
+        return ResponseEntity.created(uri).body(schedule);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseScheduleDTO> findById(@PathVariable Long id){
-        Schedule schedule = scheduleService.findById(id);
-        ResponseScheduleDTO dto = convertToResponse(schedule);
-        return ResponseEntity.ok().body(dto);
+        ResponseScheduleDTO schedule = scheduleService.findById(id);
+        return ResponseEntity.ok().body(schedule);
     }
 
     @GetMapping
-    public ResponseEntity<Page<ResponseScheduleDTO>> findAll(Pageable pageable, Schedule filtro){
-        Page<Schedule> schedule = scheduleService.findAll(pageable, filtro);
-        Page<ResponseScheduleDTO> dto = schedule.map(sc -> convertToResponse(sc));
-        return ResponseEntity.ok().body(dto);
+    public ResponseEntity<Page<ResponseScheduleDTO>> findAll(Pageable pageable, Schedule filter){
+        Page<ResponseScheduleDTO> page = scheduleService.findAll(pageable, filter);
+        return ResponseEntity.ok().body(page);
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Schedule> delete(@PathVariable Long id){
         scheduleService.delete(id);
@@ -73,55 +61,15 @@ public class ScheduleResource {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseScheduleDTO> update(@PathVariable Long id, @RequestBody @Valid CreateScheduleDTO dto){
-        Schedule schedule = convertToSchedule(dto);
-        scheduleService.update(id, schedule);
-        return null;
+    public ResponseEntity<ResponseScheduleDTO> update(@PathVariable Long id, @RequestBody @Valid UpdateScheduleDTO dto){
+        scheduleService.update(id, dto);
+        return ResponseEntity.ok().build();
     }
 
+
     @PatchMapping("/{id}")
-    public ResponseEntity<Schedule> cancelSchedule(@PathVariable Long id){
+    public ResponseEntity<Schedule> confirmSchedule(@PathVariable Long id){
         scheduleService.updateStatus(id);
         return ResponseEntity.noContent().build();
     }
-    
-    private ResponseScheduleDTO convertToResponse(Schedule schedule) {
-        ResponseScheduleDTO dto = new ResponseScheduleDTO();
-        dto.setId(schedule.getId());
-        dto.setDoctor(schedule.getDoctor().getName());
-        dto.setUser(schedule.getUser().getName());
-        dto.setSpecialty(schedule.getDoctor().getSpecialty().getDescription());
-        dto.setScheduleDate(schedule.getScheduleDate());
-        dto.setStatus(schedule.getStatus().toString());
-        dto.setType(schedule.getType().toString());
-        return dto;
-    }
-
-    private Schedule convertToSchedule(CreateScheduleDTO dto) {
-        User user = userService.findById(dto.getUserId());
-        Doctor doctor =doctorService.findById(dto.getDoctorId());
-        Specialty specialty = new Specialty();
-        specialty.setDescription(doctor.getSpecialty().getDescription());
-        Schedule schedule = new Schedule();
-        schedule.setStatus(Status.SCHEDULED);
-        schedule.setType(Type.CONSULT);
-        schedule.setScheduleDate(dto.getScheduleDate());
-        schedule.setDoctor(doctor);
-        schedule.setUser(user);
-        return schedule;
-    }
-
-    /* 
-    @GetMapping
-    public ResponseEntity<List<ResponseScheduleDTO>> findAllByUser(@RequestParam (value = "user", defaultValue = "0") Long id_user){
-       List<ResponseScheduleDTO> dto = scheduleService.findAllByUser(id_user).stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
-       return ResponseEntity.ok().body(dto);
-    }
-    
-    @GetMapping
-    public ResponseEntity<List<ResponseScheduleDTO>> findAllByDoctor(@RequestParam (value = "doctor", defaultValue = "0") Long id_doctor){
-       List<ResponseScheduleDTO> dto = scheduleService.findAllByDoctor(id_doctor).stream().map(sc -> convertToResponse(sc)).collect(Collectors.toList());
-       return ResponseEntity.ok().body(dto);
-    }
-    */
 }

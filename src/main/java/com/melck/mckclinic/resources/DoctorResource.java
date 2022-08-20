@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,18 +55,13 @@ public class DoctorResource {
     }
     
     @GetMapping
-    public ResponseEntity<List<ShortResponseDoctorDTO>> findAll(Doctor filtro){
-        List<Doctor> doctors = doctorService.findAll(filtro);
-        List<ShortResponseDoctorDTO> doctorsDto = doctors
-                                            .stream()
-                                            .map(doctor -> convertToShortResponseDoctorDTO(doctor))
-                                            .collect(Collectors.toList());
-        return ResponseEntity.ok().body(doctorsDto);
+    public ResponseEntity<Page<ShortResponseDoctorDTO>> findAllAllPaged(Doctor filter, Pageable pageable){
+        Page<ShortResponseDoctorDTO> doctors = doctorService.findAllPaged(filter, pageable);
+        return ResponseEntity.ok().body(doctors);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Doctor> update(@PathVariable Long id, @RequestBody @Valid CreateDoctorDTO dto){
-
         doctorService.update(id, dto);
         return ResponseEntity.ok().build();
     }
@@ -73,16 +70,6 @@ public class DoctorResource {
     public ResponseEntity<Doctor> delete(@PathVariable Long id){
         doctorService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-    
-
-
-    private ShortResponseDoctorDTO convertToShortResponseDoctorDTO(Doctor doctor) {
-        ShortResponseDoctorDTO dto = new ShortResponseDoctorDTO();
-        dto.setName(doctor.getName());
-        dto.setRegistry(doctor.getRegistry());
-        dto.setSpecialty(doctor.getSpecialty().getDescription());
-        return dto;
     }
     
     private ResponseDoctorDTO convertToResponseDoctorDTO(Doctor doctor) {
@@ -96,13 +83,4 @@ public class DoctorResource {
         dto.setPhoneNumber(doctor.getPhoneNumber());
         return dto;
     }
-    /* 
-    @GetMapping
-    public ResponseEntity<List<ResponseDoctorDTO>> findAllBySpecialty(@RequestParam (value = "specialty", defaultValue = "0") Long id_specialty){
-        List<ResponseDoctorDTO> dto = doctorService.findAllBySpecialty(id_specialty).stream().map(dr -> convertToResponseDoctorDTO(dr)).collect(Collectors.toList());
-        return ResponseEntity.ok().body(dto);
-    }
-    
-    */
-    
 }

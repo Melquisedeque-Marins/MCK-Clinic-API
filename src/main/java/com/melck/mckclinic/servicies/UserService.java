@@ -69,8 +69,7 @@ public class UserService implements UserDetailsService {
                                             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         Example<User> example = Example.of(filter, matcher);
         Page<User> users = userRepository.findAll(example, pageable);
-        Page<ListResponseUserDTO> listDTO = users.map(user -> modelMapper.map(user, ListResponseUserDTO.class));
-        return listDTO;
+        return  users.map(user -> modelMapper.map(user, ListResponseUserDTO.class));
     }
     
     @Transactional
@@ -100,6 +99,7 @@ public class UserService implements UserDetailsService {
     }
     
     public void delete(Long id) {
+        authService.validateSelfOrAdmin(id);
         findById(id);
         try {
             userRepository.deleteById(id);
