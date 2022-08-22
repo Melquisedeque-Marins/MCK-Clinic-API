@@ -93,6 +93,7 @@ public class ScheduleService {
         return convertToResponse(schedule);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     public Page<ResponseScheduleDTO> findAll(Pageable pageable, Schedule filter) {
         ExampleMatcher matcher = ExampleMatcher
