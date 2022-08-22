@@ -56,12 +56,10 @@ Você pode acessar os arquivos do projeto clicando [aqui](https://github.com/Mel
 ## 🎲️ Instruções para download e execução do projeto
 
 - Abra o terminal e navegue até o diretório onde deseja salvar o projeto
-``$ cd/"caminho do diretório"``.
+``$ cd /"caminho do diretório"``.
 - Faça o clone o repósitório
 ``$ git clone https://github.com/Melquisedeque-Marins/MCK-Clinic.git``
-- Acesse a pasta do projeto trminal/cmd
-``$ cd /MCK-Clinic``.
-- Acesse a pasta do projeto trminal/cmd
+- Acesse a pasta do projeto terminal/cmd
 ``$ cd /MCK-Clinic``.
 - Execute o seguinte comando caso não tenha o maven instalado
 ``$ ./mvnw clean package spring-boot:run``.
@@ -69,14 +67,14 @@ Você pode acessar os arquivos do projeto clicando [aqui](https://github.com/Mel
 ``$ mvn clean package spring-boot:run``.
 - O servidor Toncat do projeto será inicializado na porta
 ``8080``
-**do seu computador.
+do seu computador.
 
-**Para Facilitar a utilização desta API segue a collection do Postman com os endpoints disponíveis.**
+Para Facilitar a utilização desta API segue a collection do Postman com os endpoints disponíveis.
 
 <a id="Autor"></a>
 ## Autor
 <a href="https://github.com/Melquisedeque-Marins">
- <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/93653645?v=4" border-radius=50%, width="100px;" alt=""/>
+ <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/93653645?v=4" width="120px;" alt=""/>
 <br />
  <sub><b>Melquisedeque Marins Junior</b></sub></a> <a href="https://www.linkedin.com/in/melquisedeque-marins-junior-324291230"></a>
 

@@ -2,6 +2,8 @@ package com.melck.mckclinic.repositories;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +21,12 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
 
     @Query ("SELECT dr FROM Schedule dr WHERE dr.doctor.id = :id_doctor ORDER BY scheduleDate ")
     List<Schedule> findAllByDoctor(@Param(value = "id_doctor") Long id_doctor);
+
+    @Query("SELECT obj FROM Schedule obj INNER JOIN obj.user u WHERE "
+            + "(u IN :users)"
+            + "ORDER BY obj.scheduleDate")
+          //  + "(:name = '' OR LOWER(obj.name) LIKE LOWER(CONCAT ('%', :name, '%')) )")
+    Page<Schedule> find(List<User> users, Pageable pageable);
 
     List<Schedule> findByDoctor(Doctor doctor);
 

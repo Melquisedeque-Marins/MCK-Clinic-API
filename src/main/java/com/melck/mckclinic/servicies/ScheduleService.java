@@ -1,6 +1,7 @@
 package com.melck.mckclinic.servicies;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,6 +102,14 @@ public class ScheduleService {
         Example<Schedule> example = Example.of(filter, matcher);
         Page<Schedule> schedule = scheduleRepository.findAll(example, pageable);
         return schedule.map(sc -> convertToResponse(sc));
+    }
+
+    @Transactional
+    public Page<ResponseScheduleDTO> findAllByUser(Pageable pageable) {
+        User user = authService.authenticated();
+        List<User> users = Arrays.asList(userRepository.getOne(user.getId()));
+        Page<Schedule> schedules = scheduleRepository.find(users, pageable);
+        return schedules.map((sc -> convertToResponse(sc)));
     }
 
     @Transactional
