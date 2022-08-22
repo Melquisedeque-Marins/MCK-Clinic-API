@@ -55,7 +55,7 @@ public class UserService implements UserDetailsService {
         }
         var user = modelMapper.map(userDTO, User.class);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        Role role = roleRepository.getOne(1L);
+        Role role = roleRepository.getOne(2L);
         user.getRoles().add(role);
         return modelMapper.map(userRepository.save(user), ResponseUserDTO.class);
     }
